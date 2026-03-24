@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 from langchain_groq import ChatGroq
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import FakeEmbeddings
 
 load_dotenv()
 
@@ -14,9 +14,7 @@ VECTOR_DB_DIR = "vectorstores"
 
 def ask_question(question, index_id):
     # 1. Load embeddings
-    embeddings = HuggingFaceEmbeddings(
-        model_name="all-MiniLM-L6-v2"
-    )
+    embeddings = FakeEmbeddings(size=384)
 
     # 2. Load vector DB
     path = os.path.join(VECTOR_DB_DIR, index_id)
