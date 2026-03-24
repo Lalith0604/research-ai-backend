@@ -4,7 +4,7 @@ import ssl
 from dotenv import load_dotenv
 
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import FakeEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import  WebBaseLoader
 from langchain_community.vectorstores import FAISS
@@ -40,9 +40,7 @@ def process_urls(urls):
 
     print("STEP 3: Embeddings")
 
-    embeddings = HuggingFaceEmbeddings(
-        model_name="all-MiniLM-L6-v2"
-    )
+    embeddings = FakeEmbeddings(size=384)
 
     print("STEP 4: Vector store")
 
