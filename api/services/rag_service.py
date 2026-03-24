@@ -1,34 +1,31 @@
 import os
 import uuid
-import ssl
-from dotenv import load_dotenv
-
+import requests
+from bs4 import BeautifulSoup
 
 from langchain_community.embeddings import FakeEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import  WebBaseLoader
 from langchain_community.vectorstores import FAISS
 
-ssl._create_default_https_context = ssl._create_unverified_context
-
-load_dotenv()
-os.environ["USER_AGENT"] = "research-ai-app"
-
-
-
-
-
-
-# Folder to store vector DBs
 VECTOR_DB_DIR = "vectorstores"
 os.makedirs(VECTOR_DB_DIR, exist_ok=True)
 
 
-def process_urls(urls):
-    print("STEP 1: Loading URLs")
+def fetch_text(url):
+    try:
+        res = requests.get(url, timeout=10)
+        soup = BeautifulSoup(res.text, "html.parser")
+        return soup.get_text()
+    except Exception as e:
+        print(f"Error fetching {url}: {e}")
+        return ""
 
-    loader = WebBaseLoader(urls)
-    data = loader.load()
+
+def process_urls(urls):
+    print("STEP 1: Fetching URLs")
+
+    texts = [fetch_text(url) for url in urls]
+    combined_text = "\n\n".join(texts)
 
     print("STEP 2: Splitting")
 
@@ -36,7 +33,8 @@ def process_urls(urls):
         chunk_size=1000,
         chunk_overlap=200
     )
-    docs = splitter.split_documents(data)
+
+    docs = splitter.create_documents([combined_text])
 
     print("STEP 3: Embeddings")
 
